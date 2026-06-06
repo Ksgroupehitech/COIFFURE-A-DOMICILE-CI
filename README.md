@@ -1,1 +1,1 @@
-# COIFFURE-A-DOMICILE-CI
+# HOME COIFFURE CI\nProjet de démarrage.
