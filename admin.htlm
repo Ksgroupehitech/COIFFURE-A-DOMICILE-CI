@@ -116,6 +116,8 @@ alert("Accès refusé");
 
 window.location.href = "index.html";
 
+throw new Error("Accès refusé");
+
 }
 
 </script>
