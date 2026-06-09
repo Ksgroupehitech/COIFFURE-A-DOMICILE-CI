@@ -106,6 +106,19 @@ padding:6px;
 </head>
 
 <body>
+<script>
+
+const motDePasse = prompt("Entrez le mot de passe administrateur");
+
+if(motDePasse !== "Home2026@"){
+
+alert("Accès refusé");
+
+window.location.href = "index.html";
+
+}
+
+</script>
 
 <h1>Administration HOME COIFFURE CI</h1>
 
