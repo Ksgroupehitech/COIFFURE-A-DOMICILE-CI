@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration HOME COIFFURE CI</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f4f4f4;
+padding:20px;
+}
+
+header{
+background:linear-gradient(135deg,#00c6ff,#ff00aa);
+color:white;
+padding:20px;
+text-align:center;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+h1{
+font-size:28px;
+}
+
+table{
+width:100%;
+background:white;
+border-collapse:collapse;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+
+th{
+background:#ff00aa;
+color:white;
+padding:12px;
+}
+
+td{
+padding:10px;
+border-bottom:1px solid #eee;
+text-align:center;
+}
+
+tr:hover{
+background:#fafafa;
+}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+color:white;
+margin:2px;
+}
+
+.confirmer{
+background:#28a745;
+}
+
+.supprimer{
+background:#dc3545;
+}
+
+.attente{
+color:orange;
+font-weight:bold;
+}
+
+.confirme{
+color:green;
+font-weight:bold;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+margin-bottom:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,.1);
+text-align:center;
+}
+
+.card h2{
+color:#ff00aa;
+font-size:30px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>📋 ADMINISTRATION HOME COIFFURE CI</h1>
+<p>Gestion des réservations</p>
+</header>
+
+<div class="stats">
+
+<div class="card">
+<h2 id="total">0</h2>
+<p>Total Réservations</p>
+</div>
+
+<div class="card">
+<h2 id="attente">0</h2>
+<p>En attente</p>
+</div>
+
+<div class="card">
+<h2 id="confirmees">0</h2>
+<p>Confirmées</p>
+</div>
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Nom</th>
+<th>Téléphone</th>
+<th>Date</th>
+<th>Heure</th>
+<th>Paiement</th>
+<th>Adresse</th>
+<th>Statut</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="listeReservations">
+</tbody>
+
+</table>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs,
+deleteDoc,
+doc,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "VOTRE_API_KEY",
+
+authDomain: "home-coiffure-ci.firebaseapp.com",
+
+projectId: "home-coiffure-ci",
+
+storageBucket: "home-coiffure-ci.firebasestorage.app",
+
+messagingSenderId: "674027032595",
+
+appId: "VOTRE_APP_ID"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const tbody = document.getElementById("listeReservations");
+
+async function chargerReservations(){
+
+tbody.innerHTML="";
+
+let total=0;
+let attente=0;
+let confirmees=0;
+
+const snapshot = await getDocs(collection(db,"reservations"));
+
+snapshot.forEach((documento)=>{
+
+const data=documento.data();
+
+total++;
+
+if(data.statut==="Confirmée"){
+confirmees++;
+}else{
+attente++;
+}
+
+const ligne=`
+<tr>
+
+<td>${data.nom || ""}</td>
+
+<td>${data.telephone || ""}</td>
+
+<td>${data.date || ""}</td>
+
+<td>${data.heure || ""}</td>
+
+<td>${data.paiement || ""}</td>
+
+<td>${data.adresse || ""}</td>
+
+<td class="${data.statut==="Confirmée" ? "confirme" : "attente"}">
+${data.statut || "En attente"}
+</td>
+
+<td>
+
+<button class="confirmer"
+onclick="confirmerReservation('${documento.id}')">
+Confirmer
+</button>
+
+<button class="supprimer"
+onclick="supprimerReservation('${documento.id}')">
+Supprimer
+</button>
+
+</td>
+
+</tr>
+`;
+
+tbody.innerHTML += ligne;
+
+});
+
+document.getElementById("total").innerText=total;
+document.getElementById("attente").innerText=attente;
+document.getElementById("confirmees").innerText=confirmees;
+
+}
+
+window.confirmerReservation = async(id)=>{
+
+await updateDoc(doc(db,"reservations",id),{
+
+statut:"Confirmée"
+
+});
+
+alert("Réservation confirmée");
+
+chargerReservations();
+
+}
+
+window.supprimerReservation = async(id)=>{
+
+if(confirm("Supprimer cette réservation ?")){
+
+await deleteDoc(doc(db,"reservations",id));
+
+alert("Réservation supprimée");
+
+chargerReservations();
+
+}
+
+}
+
+chargerReservations();
+
+</script>
+
+</body>
+</html>
