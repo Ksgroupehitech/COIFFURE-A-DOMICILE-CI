@@ -106,7 +106,10 @@ padding:6px;
 </head>
 
 <body>
+
 <script>
+
+alert("Test sécurité");
 
 const motDePasse = prompt("Entrez le mot de passe administrateur");
 
